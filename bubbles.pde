@@ -15,6 +15,12 @@ color getRandomColor() {
 double linearInterpolate(double x1, double x2, double weight) {
   return (1 - weight) * x1 + weight * x2;
 }
+
+float distSquared(float x1,float y1,float x2,float y2) {
+  float xDiff = x1 - x2;
+  float yDiff = y1 - y2;
+  return (xDiff * xDiff) + (yDiff * yDiff);
+}
 // --
 
 void setup() {
@@ -24,8 +30,10 @@ void setup() {
 
 
 boolean areBubblesIntersecting(Bubble bubble1, Bubble bubble2) {
-  float distance = dist(bubble1.x, bubble1.y, bubble2.x, bubble2.y);
-  return distance <= (bubble1.radius) + (bubble2.radius);
+  // use distance squared for optimized collision checking
+  float minDistance = bubble1.radius + bubble2.radius;
+  float distanceSquared = distSquared(bubble1.x, bubble1.y, bubble2.x, bubble2.y);
+  return distanceSquared <= minDistance * minDistance;
 }
 
 boolean isBubbleIntersectingWall(Bubble bubble) {
@@ -43,9 +51,11 @@ void draw() {
   text("Bubble Amount: " + bubbles.size(), 0, 25);
   for (Bubble bubble : bubbles) {
     bubble.tick();
+    // collisions with walls
     if (isBubbleIntersectingWall(bubble)) {
       contactList.add(bubble);
     }
+    // bubble to bubble collisions
     for (Bubble bubble1 : bubbles) {
       if (bubble != bubble1) {
         if (areBubblesIntersecting(bubble, bubble1)) {
@@ -55,7 +65,9 @@ void draw() {
       }
     }
   }
+  // loop through the contact list and remove all of the bubbles
   for (Bubble bubble : contactList) {
+      // a bubble may already have been removed from the list, check to see if it's not null
       if (bubble != null) {
         bubbles.remove(bubble);
       }

@@ -28,7 +28,6 @@
     ellipse(x, y, size, size);
   }
   float getOverlap() {
-    
     return max(lineHeight - (y - radius), 0.0);
   }
   
@@ -49,6 +48,7 @@
 
   void tick() {
     if (isFiltered()){
+      // getting the overlap to "resolve" the collision between the line and the bubble
       y += getOverlap();
       speedY = 0.0;
       speedMultiplierX = 0.0;
