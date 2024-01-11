@@ -84,7 +84,7 @@ void draw() {
 }
 
 void mousePressed() {
-  for (int i = 0; i < 30; i++) {
+  for (int i = 0; i < 10; i++) {
     float randX = (float)(Math.random() * width);
     float randY = (float)(Math.random() * height);
     bubbles.add(new Bubble(randX, randY));
