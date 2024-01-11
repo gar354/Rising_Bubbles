@@ -5,7 +5,7 @@
   float size;
   float radius;
   float speedY;
-  float speedMultiplierX;
+  boolean isRed;
   color bubbleColor;
   
   Bubble(float _y) {
@@ -15,7 +15,7 @@
    y = _y + size;
    radius = size / 2.0;
    speedY = 0.005 * size * size;
-   speedMultiplierX = 1.0;
+   isRed = _isRed();
   }
   
   Bubble(float _x, float _y) {
@@ -27,21 +27,27 @@
     fill(bubbleColor);
     ellipse(x, y, size, size);
   }
+
   float getOverlap() {
-    return max(lineHeight - (y - radius), 0.0);
+    return max(lineHeight - (y - radius) - collisionSlop, 0.0);
   }
-  
-  
-  boolean isFiltered() {
+  boolean _isRed() {
     // bitshifting hackery from processing docs to get color values
     float red = bubbleColor >> 16 & 0xFF;
     float blue = bubbleColor & 0xFF;
     float green = bubbleColor >> 8 & 0xFF;
-    return (!(red > blue && red > green)) && getOverlap() > 0.0;
+    return (red > blue && red > green);
+  }
+  
+  boolean isFiltered() {
+    if (isRed) {
+      return false;
+    }
+    return (getOverlap() > 0.0);
   }
 
   void wrapY() {
-    if (y <= -size) {
+    if (y < -size) {
       y = height + size;
     }
   }
@@ -50,11 +56,12 @@
     if (isFiltered()){
       // getting the overlap to "resolve" the collision between the line and the bubble
       y += getOverlap();
-      speedY = 0.0;
-      speedMultiplierX = 0.0;
+      show();
+      return;
     }
+    
     y -= speedY;
-    x += (float)linearInterpolate(-1, 1, Math.random()) * speedMultiplierX;
+    x += (float)linearInterpolate(-1, 1, Math.random());
     wrapY();
     show();
     
